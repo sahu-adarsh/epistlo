@@ -78,7 +78,7 @@ def start_main_services():
 
 def main():
     """Main startup function"""
-    print("🎉 Gmail Clone - Integrated Server Startup")
+    print("🎉 Epistlo - Integrated Server Startup")
     print("=" * 50)
     print(f"Development Mode: {settings.development_mode}")
     print(f"Email Server Port: {settings.smtp_receive_port}")

@@ -40,9 +40,9 @@ const Login: React.FC = () => {
     setLoading(true);
     setError('');
 
-    // Validate 27send.com email domain
-    if (!email.endsWith('@27send.com')) {
-      setError('Please enter a valid 27send.com email address');
+    // Validate epistlo.com email domain
+    if (!email.endsWith('@epistlo.com')) {
+      setError('Please enter a valid epistlo.com email address');
       setLoading(false);
       return;
     }
@@ -163,7 +163,7 @@ const Login: React.FC = () => {
                 fontWeight: 600,
               }}
             >
-              Sign in to 27send
+              Sign in to Epistlo
             </Typography>
             <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1, width: '100%' }}>
               {error && (

@@ -88,7 +88,7 @@ class SMTPHandler:
                     server = smtplib.SMTP('localhost', settings.smtp_receive_port, timeout=60)
                     
                     # Send HELO command (required by SMTP protocol)
-                    server.helo('gmail-clone')
+                    server.helo('epistlo')
                     
                     # Send email without authentication in development
                     all_recipients = to_emails + (cc_emails or []) + (bcc_emails or [])

@@ -3,7 +3,7 @@ export const config = {
   EMAIL_SERVICE_URL: process.env.REACT_APP_EMAIL_SERVICE_URL || 'http://localhost:8001',
   MAILBOX_SERVICE_URL: process.env.REACT_APP_MAILBOX_SERVICE_URL || 'http://localhost:8002',
   WS_BASE_URL: process.env.REACT_APP_WS_BASE_URL || 'ws://localhost:8000',
-  STORAGE_KEY: 'gmail_clone_token',
+  STORAGE_KEY: 'epistlo_token',
   DEFAULT_PAGE_SIZE: 20,
   SUPABASE_URL: process.env.REACT_APP_SUPABASE_URL || '',
   SUPABASE_ANON_KEY: process.env.REACT_APP_SUPABASE_ANON_KEY || '',

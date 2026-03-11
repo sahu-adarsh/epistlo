@@ -1,7 +1,7 @@
 {
-  "name": "gmail-clone-frontend",
+  "name": "epistlo-frontend",
   "version": "1.0.0",
-  "description": "27send Frontend",
+  "description": "Epistlo Frontend",
   "main": "index.js",
   "scripts": {
     "start": "react-scripts start",

@@ -74,7 +74,7 @@ const MultiStepRegister: React.FC = () => {
     setError('');
 
     try {
-      const email = `${username}@27send.com`;
+      const email = `${username}@epistlo.com`;
       const response = await fetch(`${config.API_BASE_URL}${API_ENDPOINTS.AUTH.CHECK_EMAIL_AVAILABILITY}`, {
         method: 'POST',
         headers: {
@@ -157,7 +157,7 @@ const MultiStepRegister: React.FC = () => {
     }
 
     try {
-      const email = `${formData.username}@27send.com`;
+      const email = `${formData.username}@epistlo.com`;
       const response = await fetch(`${config.API_BASE_URL}${API_ENDPOINTS.AUTH.REGISTER}`, {
         method: 'POST',
         headers: {
@@ -270,7 +270,7 @@ const MultiStepRegister: React.FC = () => {
         return (
           <Box sx={{ width: '100%' }}>
             <Typography variant="h6" sx={{ mb: 3, textAlign: 'center', color: 'white' }}>
-              Choose your 27send address
+              Choose your Epistlo address
             </Typography>
             <Box sx={{ display: 'flex', alignItems: 'flex-end', gap: 1 }}>
               <TextField
@@ -298,7 +298,7 @@ const MultiStepRegister: React.FC = () => {
                   whiteSpace: 'nowrap'
                 }}
               >
-                @27send.com
+                @epistlo.com
               </Typography>
             </Box>
             {usernameAvailable === true && (
@@ -330,7 +330,7 @@ const MultiStepRegister: React.FC = () => {
               Create a strong password
             </Typography>
             <Typography variant="body2" sx={{ mb: 2, color: 'rgba(255, 255, 255, 0.7)', textAlign: 'center' }}>
-              Your email: {formData.username}@27send.com
+              Your email: {formData.username}@epistlo.com
             </Typography>
             <TextField
               margin="normal"
@@ -441,7 +441,7 @@ const MultiStepRegister: React.FC = () => {
                 fontWeight: 600,
               }}
             >
-              Create your 27send Account
+              Create your Epistlo Account
             </Typography>
 
             {/* Stepper */}

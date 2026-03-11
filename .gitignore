@@ -1,5 +1,9 @@
 docs/*
 .env
+backend/.env
 frontend/.env
 venv
 frontend/node_modules/
+__pycache__/
+*.pyc
+*.pyo

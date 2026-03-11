@@ -126,7 +126,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     WebkitTextFillColor: 'transparent',
                   }}
                 >
-                  27send
+                  Epistlo
                 </Typography>
               </Box>
 

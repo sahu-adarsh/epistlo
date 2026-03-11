@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 Email Server Startup Script
-Runs the SMTP/IMAP server for the 27send application
+Runs the SMTP/IMAP server for the Epistlo application
 """
 
 import os
@@ -34,7 +34,7 @@ async def main():
         sys.exit(1)
 
 if __name__ == "__main__":
-    print("Starting 27send Email Server...")
+    print("Starting Epistlo Email Server...")
     print("Press Ctrl+C to stop")
     
     try:

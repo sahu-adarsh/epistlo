@@ -131,11 +131,11 @@ async def health_check():
 async def check_email_availability(request: EmailAvailabilityRequest):
     """Check if an email address is available for registration"""
     try:
-        # Only allow 27send.com domain emails
-        if not request.email.endswith("@27send.com"):
+        # Only allow epistlo.com domain emails
+        if not request.email.endswith("@epistlo.com"):
             raise HTTPException(
                 status_code=400, 
-                detail="Only 27send.com email addresses are allowed"
+                detail="Only epistlo.com email addresses are allowed"
             )
         
         existing_user = get_user(request.email)
@@ -163,11 +163,11 @@ def register(user: UserCreate):
             detail="Database configuration error. Please check your Supabase credentials."
         )
     
-    # Only allow 27send.com domain emails
-    if not user.email.endswith("@27send.com"):
+    # Only allow epistlo.com domain emails
+    if not user.email.endswith("@epistlo.com"):
         raise HTTPException(
             status_code=400, 
-            detail="Only 27send.com email addresses are allowed for registration"
+            detail="Only epistlo.com email addresses are allowed for registration"
         )
     
     # Check if user already exists
@@ -215,11 +215,11 @@ async def get_user_by_id_endpoint(user_id: str):
 async def login_for_access_token(
     form_data: OAuth2PasswordRequestForm = Depends()
 ):
-    # Only allow 27send.com domain emails for login
-    if not form_data.username.endswith("@27send.com"):
+    # Only allow epistlo.com domain emails for login
+    if not form_data.username.endswith("@epistlo.com"):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Only 27send.com email addresses are allowed for login",
+            detail="Only epistlo.com email addresses are allowed for login",
             headers={"WWW-Authenticate": "Bearer"},
         )
     

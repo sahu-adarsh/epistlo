@@ -397,7 +397,7 @@ const LandingPage: React.FC = () => {
                fontWeight: 300
              }}
            >
-             Made with ❤️ by 27send © 2025
+             Made with ❤️ by Epistlo © 2025
            </Typography>
          </Container>
        </Box>

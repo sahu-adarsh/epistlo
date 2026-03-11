@@ -1,4 +1,8 @@
-# 27send- Comprehensive Mailing Service
+# Epistlo- Comprehensive Mailing Service
+
+- From Latin epistola → Greek epistolē (ἐπιστολή)
+- epi (upon/to) + stellein (to send) → "something sent to someone"
+- So Epistlo literally means "to send" at its root
 
 ## Table of Contents
 1. [Project Overview](#project-overview)
@@ -70,7 +74,7 @@ This is a comprehensive mailing service application built with modern technologi
 
 ### **Fully Integrated Email Server**
 
-The 27send includes a **complete SMTP/IMAP email server** that provides:
+The Epistlo includes a **complete SMTP/IMAP email server** that provides:
 
 - **SMTP Server** (Port 2525): Receives incoming emails
 - **IMAP Server** (Port 1143): Provides email access and management
@@ -172,10 +176,10 @@ The optimizations are implemented in `backend/email_service/main.py`:
 1. **Start the Integrated Server**:
    ```bash
    # Windows
-   start_gmail_clone.bat
+   start_epistlo.bat
    
    # Linux/Mac
-   ./start_gmail_clone.sh
+   ./start_epistlo.sh
    
    # Or manually
    cd backend
@@ -207,7 +211,7 @@ The optimizations are implemented in `backend/email_service/main.py`:
 ```bash
 # Clone and setup
 git clone <repository-url>
-cd gmail-clone
+cd epistlo
 
 # Install dependencies
 npm install  # Frontend
@@ -229,7 +233,7 @@ npm start  # Frontend
 ## Project Structure
 
 ```
-gmail-clone/
+epistlo/
 ├── frontend/                 # React.js frontend
 ├── backend/                  # Python microservices
 │   ├── auth_service/        # Authentication service
