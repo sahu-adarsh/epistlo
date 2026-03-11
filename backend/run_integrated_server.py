@@ -76,6 +76,23 @@ def start_main_services():
     
     return processes
 
+def check_optional_services():
+    """Check optional infrastructure services and warn if unavailable"""
+    import socket
+    services = [
+        ("Elasticsearch", "localhost", 9200),
+        ("Redis", "localhost", 6379),
+    ]
+    print("\n📡 Optional Services:")
+    for name, host, port in services:
+        try:
+            sock = socket.create_connection((host, port), timeout=1)
+            sock.close()
+            print(f"  ✅ {name}: running on port {port}")
+        except Exception:
+            print(f"  ⚠️  {name}: not running on port {port} (app will use fallback)")
+
+
 def main():
     """Main startup function"""
     print("🎉 Epistlo - Integrated Server Startup")
@@ -104,7 +121,9 @@ def main():
     print("\n🌐 Frontend: http://localhost:3000")
     print("=" * 50)
     print("Press Ctrl+C to stop all services")
-    
+    check_optional_services()
+    print()
+
     try:
         # Keep the main process running
         while True:

@@ -50,8 +50,14 @@ Epistlo/
 
 ### Backend
 ```bash
+# Start infrastructure (requires Docker)
+docker-compose up -d
+
 cd backend
 python run_integrated_server.py
+
+# Init ES index (first time only)
+python3 init_elasticsearch.py
 ```
 This starts all 3 FastAPI services + the SMTP/IMAP email server.
 

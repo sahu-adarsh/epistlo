@@ -356,25 +356,33 @@ const EmailInterface: React.FC = () => {
 
   const handleReplyToEmail = (email: Email) => {
     // Create a reply email with the original sender as recipient
+    // Do NOT spread the original email's id — reply is always a new email
     const replyEmail = {
-      ...email,
       subject: email.subject.startsWith('Re:') ? email.subject : `Re: ${email.subject}`,
-      to_addresses: [email.from_address], // Reply to the original sender
+      to_addresses: [email.from_address],
+      cc_addresses: [],
+      bcc_addresses: [],
       body: `\n\n--- Original Message ---\nFrom: ${email.from_address.name || email.from_address.email}\nDate: ${new Date(email.created_at).toLocaleString()}\nSubject: ${email.subject}\n\n${email.body}`,
+      priority: email.priority,
+      attachments: [],
     };
-    setSelectedEmail(replyEmail);
+    setSelectedEmail(replyEmail as any);
     setComposeOpen(true);
   };
 
   const handleForwardEmail = (email: Email) => {
     // Create a forward email
+    // Do NOT spread the original email's id — forward is always a new email
     const forwardEmail = {
-      ...email,
       subject: email.subject.startsWith('Fwd:') ? email.subject : `Fwd: ${email.subject}`,
-      to_addresses: [], // Empty for forwarding
+      to_addresses: [],
+      cc_addresses: [],
+      bcc_addresses: [],
       body: `\n\n--- Forwarded Message ---\nFrom: ${email.from_address.name || email.from_address.email}\nDate: ${new Date(email.created_at).toLocaleString()}\nSubject: ${email.subject}\n\n${email.body}`,
+      priority: email.priority,
+      attachments: [],
     };
-    setSelectedEmail(forwardEmail);
+    setSelectedEmail(forwardEmail as any);
     setComposeOpen(true);
   };
 
@@ -598,11 +606,11 @@ const EmailInterface: React.FC = () => {
     }
     
     try {
-      const endpoint = selectedEmail 
+      const endpoint = selectedEmail?.id
         ? `${config.EMAIL_SERVICE_URL}${API_ENDPOINTS.EMAILS.UPDATE.replace('{id}', selectedEmail.id)}?user_id=${user.id}`
         : `${config.EMAIL_SERVICE_URL}${API_ENDPOINTS.EMAILS.COMPOSE}?user_id=${user.id}`;
-      
-      const method = selectedEmail ? 'PUT' : 'POST';
+
+      const method = selectedEmail?.id ? 'PUT' : 'POST';
       
       // Transform emailData to include attachment_ids instead of uploadedAttachments
       const transformedEmailData = {
@@ -649,12 +657,12 @@ const EmailInterface: React.FC = () => {
     }
     
     try {
-      const endpoint = selectedEmail 
+      const endpoint = selectedEmail?.id
         ? `${config.EMAIL_SERVICE_URL}${API_ENDPOINTS.EMAILS.UPDATE.replace('{id}', selectedEmail.id)}?user_id=${user.id}`
         : `${config.EMAIL_SERVICE_URL}${API_ENDPOINTS.EMAILS.COMPOSE}?user_id=${user.id}`;
-      
-      const method = selectedEmail ? 'PUT' : 'POST';
-      
+
+      const method = selectedEmail?.id ? 'PUT' : 'POST';
+
       // Transform emailData to include attachment_ids instead of uploadedAttachments
       const transformedEmailData = {
         ...emailData,
