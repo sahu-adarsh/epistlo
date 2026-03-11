@@ -222,9 +222,16 @@ pip install -r requirements.txt  # Backend
 # 2. Get your project URL and API keys
 # 3. Run the SQL scripts in docs/phase1-foundation-setup.md
 
+
+# Start infrastructure (requires Docker)
+docker-compose up -d
+
 # Start the integrated server (includes email server)
 cd backend
 python run_integrated_server.py
+
+# Init ES index (first time only)
+python3 init_elasticsearch.py
 
 # Or start frontend separately
 npm start  # Frontend
