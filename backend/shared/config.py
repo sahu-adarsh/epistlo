@@ -1,10 +1,7 @@
 from pydantic_settings import BaseSettings
-from typing import Optional, Dict, Any
+from typing import Optional
 from dotenv import load_dotenv
 import os
-import boto3
-from botocore.exceptions import ClientError, NoCredentialsError
-import logging
 
 load_dotenv()
 
@@ -50,16 +47,10 @@ class Settings(BaseSettings):
     # AWS S3
     S3_BUCKET: Optional[str] = os.getenv('S3_BUCKET')
     
-    # AWS SES Configuration
-    AWS_SES_VERIFIED_DOMAIN: Optional[str] = os.getenv('AWS_SES_VERIFIED_DOMAIN')
-    AWS_SES_SMTP_SERVER: Optional[str] = os.getenv('AWS_SES_SMTP_SERVER')
-    # Note: AWS SES SMTP port is hardcoded to 465 (SSL) for Windows compatibility
-    AWS_SES_SMTP_USERNAME: Optional[str] = os.getenv('AWS_SES_SMTP_USERNAME')
-    AWS_SES_SMTP_PASSWORD: Optional[str] = os.getenv('AWS_SES_SMTP_PASSWORD')
-    
-    # Production settings
-    PRODUCTION_MODE: bool = os.getenv('PRODUCTION_MODE', 'false').lower() == 'true'
-    ENABLE_AWS_SES: bool = os.getenv('ENABLE_AWS_SES', 'false').lower() == 'true'
+
+    # Resend Configuration
+    RESEND_API_KEY: Optional[str] = os.getenv('RESEND_API_KEY')
+    ENABLE_RESEND: bool = os.getenv('ENABLE_RESEND', 'false').lower() == 'true'
     
     # Rate limiting
     MAX_EMAILS_PER_HOUR: int = int(os.getenv('MAX_EMAILS_PER_HOUR'))
@@ -79,91 +70,5 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         extra = "ignore"
-    
-    def get_ses_client(self) -> boto3.client:
-        """Get configured SES client"""
-        logger = logging.getLogger(__name__)
-        try:
-            if self.AWS_ACCESS_KEY_ID and self.AWS_SECRET_ACCESS_KEY:
-                return boto3.client(
-                    'ses',
-                    region_name=self.AWS_REGION,
-                    aws_access_key_id=self.AWS_ACCESS_KEY_ID,
-                    aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY
-                )
-            else:
-                # Use default credentials (IAM role, environment, etc.)
-                return boto3.client('ses', region_name=self.AWS_REGION)
-        except NoCredentialsError:
-            logger.error("AWS credentials not found. Please configure AWS credentials.")
-            raise
-        except Exception as e:
-            logger.error(f"Failed to create SES client: {e}")
-            raise
-    
-    def verify_ses_configuration(self) -> Dict[str, Any]:
-        """Verify SES configuration and return status"""
-        logger = logging.getLogger(__name__)
-        try:
-            ses_client = self.get_ses_client()
-            
-            # Check sending quota
-            quota_response = ses_client.get_send_quota()
-            
-            # Check domain verification status
-            domain_response = ses_client.get_identity_verification_attributes(
-                Identities=[self.AWS_SES_VERIFIED_DOMAIN]
-            )
-            
-            domain_status = domain_response.get('VerificationAttributes', {}).get(
-                self.AWS_SES_VERIFIED_DOMAIN, {}
-            ).get('VerificationStatus', 'NotStarted')
-            
-            return {
-                'status': 'success',
-                'domain': self.AWS_SES_VERIFIED_DOMAIN,
-                'domain_verified': domain_status == 'Success',
-                'daily_quota': quota_response.get('Max24HourSend', 0),
-                'daily_sent': quota_response.get('SentLast24Hours', 0),
-                'send_rate': quota_response.get('MaxSendRate', 0),
-                'region': self.AWS_REGION
-            }
-            
-        except ClientError as e:
-            logger.error(f"AWS SES configuration error: {e}")
-            return {
-                'status': 'error',
-                'error': str(e),
-                'error_code': e.response['Error']['Code']
-            }
-        except Exception as e:
-            logger.error(f"Failed to verify SES configuration: {e}")
-            return {
-                'status': 'error',
-                'error': str(e)
-            }
-    
-    def is_production_ready(self) -> bool:
-        """Check if SES is ready for production use"""
-        config_status = self.verify_ses_configuration()
-        
-        if config_status['status'] != 'success':
-            return False
-            
-        return (
-            config_status.get('domain_verified', False) and
-            config_status.get('daily_quota', 0) >= 200  # Production access typically has higher quota
-        )
-    
-    def get_smtp_config(self) -> Dict[str, Any]:
-        """Get SMTP configuration for AWS SES (uses port 465 SSL)"""
-        return {
-            'smtp_server': self.AWS_SES_SMTP_SERVER,
-            'smtp_port': 465,  # Always use port 465 (SSL) for AWS SES - works reliably on Windows
-            'username': self.AWS_SES_SMTP_USERNAME,
-            'password': self.AWS_SES_SMTP_PASSWORD,
-            'use_ssl': True,  # Port 465 uses SSL directly
-            'timeout': 30
-        }
 
 settings = Settings() 
