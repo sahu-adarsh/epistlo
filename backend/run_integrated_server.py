@@ -24,7 +24,7 @@ def start_email_server():
         # Start email server in background
         process = subprocess.Popen([
             sys.executable, "run_email_server.py"
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ])
         
         # Wait a moment for the server to start
         time.sleep(3)
@@ -65,9 +65,7 @@ def start_main_services():
         try:
             print(f"Starting {service['name']}...")
             process = subprocess.Popen(
-                service['command'],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE
+                service['command']
             )
             processes.append((service['name'], process))
             time.sleep(1)  # Small delay between services
