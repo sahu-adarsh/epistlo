@@ -206,21 +206,18 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
      const handleRemoveUploadedAttachment = async (attachmentId: string) => {
      // Prevent double deletion - check if attachment is already being deleted
      if (uploadingAttachments.includes(attachmentId)) {
-       console.log(`⚠️ Attachment ${attachmentId} is already being deleted, skipping...`);
        return;
      }
 
      // Check if attachment still exists in the list
      const attachmentExists = emailData.uploadedAttachments.some(att => att.id === attachmentId);
      if (!attachmentExists) {
-       console.log(`⚠️ Attachment ${attachmentId} no longer exists in UI, skipping deletion...`);
        return;
      }
 
      try {
        // Mark attachment as being deleted to prevent double calls
        setUploadingAttachments(prev => [...prev, attachmentId]);
-       console.log(`🗑️ Starting deletion of attachment: ${attachmentId}`);
 
        await attachmentService.deleteAttachment(attachmentId, userId);
        
@@ -230,15 +227,13 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
          uploadedAttachments: prev.uploadedAttachments.filter(att => att.id !== attachmentId)
        }));
        
-       console.log(`✅ Successfully removed attachment: ${attachmentId}`);
        setUploadError(null); // Clear any previous errors
      } catch (error) {
        console.error('Error removing attachment:', error);
        const errorMessage = error instanceof Error ? error.message : 'Failed to remove attachment';
-       
+
        // Check if it's a "not found" error (attachment already deleted)
        if (errorMessage.includes('not found') || errorMessage.includes('404')) {
-         console.log(`ℹ️ Attachment was already deleted, removing from UI: ${attachmentId}`);
          // Remove from UI anyway since it's already gone from server
          setEmailData(prev => ({
            ...prev,
