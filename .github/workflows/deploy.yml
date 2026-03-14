@@ -1,0 +1,43 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 54.242.20.213
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "=== Pulling latest code ==="
+            cd /opt/epistlo
+            git pull origin main
+
+            echo "=== Installing Python dependencies ==="
+            source venv/bin/activate
+            pip install -q -r requirements.txt
+
+            echo "=== Building frontend ==="
+            cd /opt/epistlo/frontend
+            GENERATE_SOURCEMAP=false CI=false npm install --silent
+            GENERATE_SOURCEMAP=false CI=false npm run build
+
+            echo "=== Restarting backend ==="
+            sudo systemctl restart epistlo-backend
+            sleep 8
+
+            echo "=== Health checks ==="
+            curl -sf https://api.epistlo.com/health
+            curl -sf https://api.epistlo.com/email/health
+            curl -sf https://api.epistlo.com/mailbox/health
+
+            echo "=== Deploy complete ==="
