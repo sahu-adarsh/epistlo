@@ -92,9 +92,6 @@ class AttachmentService {
   }
 
   async deleteAttachment(attachmentId: string, userId: string): Promise<void> {
-    console.log(`🗑️ Deleting attachment: ${attachmentId} for user: ${userId}`);
-    console.log(`📡 Request URL: ${this._baseUrl}/attachments/${attachmentId}?user_id=${userId}`);
-    
     try {
       const response = await fetch(`${this._baseUrl}/attachments/${attachmentId}?user_id=${userId}`, {
         method: 'DELETE',
@@ -103,25 +100,21 @@ class AttachmentService {
         },
       });
 
-      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
-
       if (!response.ok) {
         let errorMessage = 'Failed to delete attachment';
         try {
           const error = await response.json();
           errorMessage = error.detail || error.message || errorMessage;
-          console.error('❌ Backend error:', error);
+          console.error('Backend error:', error);
         } catch (e) {
           // If response is not JSON, use status text
           errorMessage = `HTTP ${response.status}: ${response.statusText}`;
-          console.error('❌ Non-JSON error response:', response.statusText);
+          console.error('Non-JSON error response:', response.statusText);
         }
         throw new Error(errorMessage);
       }
-      
-      console.log('✅ Attachment deleted successfully');
     } catch (error) {
-      console.error('❌ Network or fetch error:', error);
+      console.error('Network or fetch error:', error);
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new Error('Unable to connect to email service. Please ensure the backend is running.');
       }

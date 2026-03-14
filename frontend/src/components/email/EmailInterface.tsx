@@ -272,20 +272,6 @@ const EmailInterface: React.FC = () => {
         const data = await response.json();
         const emailsData = data.emails || [];
         
-        // Debug: Check for emails with attachments
-        const emailsWithAttachments = emailsData.filter((email: any) => email.attachments && email.attachments.length > 0);
-        if (emailsWithAttachments.length > 0) {
-          console.log('📎 Found emails with attachments:', emailsWithAttachments.length);
-          emailsWithAttachments.forEach((email: any) => {
-            console.log(`  - Email: ${email.subject}, Attachments: ${email.attachments.length}`);
-            email.attachments.forEach((att: any) => {
-              console.log(`    - ${att.filename} (${att.id}) - URL: ${att.url}`);
-            });
-          });
-        } else {
-          console.log('📎 No emails with attachments found');
-        }
-        
         setEmails(emailsData);
         setTotalEmails(data.total || 0);
         setHasMore(data.has_more || false);
@@ -323,14 +309,6 @@ const EmailInterface: React.FC = () => {
   };
 
   const handleEmailClick = async (email: Email) => {
-    // Debug: Log email data when clicked
-    console.log('📧 Email clicked:', {
-      id: email.id,
-      subject: email.subject,
-      attachments: email.attachments,
-      attachmentCount: email.attachments?.length || 0
-    });
-    
     // If it's a draft email, open compose dialog for editing
     if (email.status === 'draft') {
       setSelectedEmail(email);
@@ -825,8 +803,6 @@ const EmailInterface: React.FC = () => {
 
   const handleBulkReportSpam = async () => {
     // TODO: Implement bulk report spam functionality
-    // This would typically move emails to spam folder
-    console.log('Bulk report spam for emails:', selectedEmails);
     setSelectedEmails([]);
   };
 

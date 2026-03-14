@@ -118,7 +118,7 @@ const LandingPage: React.FC = () => {
                    }}
                  >
                    Experience the next generation of email communication with AI-powered features, 
-                   enterprise security, and seamless collaboration.
+                   enterprise security and seamless collaboration.
                  </Typography>
                 <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
                   <Button
