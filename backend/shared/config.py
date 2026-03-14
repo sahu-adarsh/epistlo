@@ -60,6 +60,10 @@ class Settings(BaseSettings):
     # Production settings
     PRODUCTION_MODE: bool = os.getenv('PRODUCTION_MODE', 'false').lower() == 'true'
     ENABLE_AWS_SES: bool = os.getenv('ENABLE_AWS_SES', 'false').lower() == 'true'
+
+    # Resend Configuration
+    RESEND_API_KEY: Optional[str] = os.getenv('RESEND_API_KEY')
+    ENABLE_RESEND: bool = os.getenv('ENABLE_RESEND', 'false').lower() == 'true'
     
     # Rate limiting
     MAX_EMAILS_PER_HOUR: int = int(os.getenv('MAX_EMAILS_PER_HOUR'))

@@ -15,6 +15,7 @@ from .models import (
 from .database import EmailDatabase
 from .smtp_handler import SMTPHandler
 from .aws_ses_handler import AWSSESHandler, AWSSESSMTPHandler
+from .resend_handler import ResendHandler
 from .attachment_handler import attachment_handler
 from shared.config import settings
 from shared.elasticsearch_service import elasticsearch_service
@@ -33,14 +34,17 @@ app.add_middleware(
 # Initialize handlers
 def get_email_handler():
     """Get the appropriate email handler based on configuration"""
-    if settings.ENABLE_AWS_SES and settings.PRODUCTION_MODE:
-        print("🔧 Using AWS SES handler for production email sending")
+    if settings.ENABLE_RESEND and settings.RESEND_API_KEY:
+        print("Using Resend handler for email sending")
+        return ResendHandler()
+    elif settings.ENABLE_AWS_SES and settings.PRODUCTION_MODE:
+        print("Using AWS SES handler for production email sending")
         return AWSSESHandler()
     elif settings.ENABLE_AWS_SES:
-        print("🔧 Using AWS SES SMTP handler for email sending")  
+        print("Using AWS SES SMTP handler for email sending")
         return AWSSESSMTPHandler()
     else:
-        print("🔧 Using local SMTP handler for email sending")
+        print("Using local SMTP handler for email sending")
         return SMTPHandler()
 
 # Initialize email handler
