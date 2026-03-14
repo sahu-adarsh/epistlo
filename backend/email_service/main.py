@@ -14,7 +14,6 @@ from .models import (
 )
 from .database import EmailDatabase
 from .smtp_handler import SMTPHandler
-from .aws_ses_handler import AWSSESHandler, AWSSESSMTPHandler
 from .resend_handler import ResendHandler
 from .attachment_handler import attachment_handler
 from shared.config import settings
@@ -37,12 +36,6 @@ def get_email_handler():
     if settings.ENABLE_RESEND and settings.RESEND_API_KEY:
         print("Using Resend handler for email sending")
         return ResendHandler()
-    elif settings.ENABLE_AWS_SES and settings.PRODUCTION_MODE:
-        print("Using AWS SES handler for production email sending")
-        return AWSSESHandler()
-    elif settings.ENABLE_AWS_SES:
-        print("Using AWS SES SMTP handler for email sending")
-        return AWSSESSMTPHandler()
     else:
         print("Using local SMTP handler for email sending")
         return SMTPHandler()
@@ -66,81 +59,6 @@ async def health_check():
     """Health check endpoint"""
     return {"status": "healthy", "service": "email-service"}
 
-@app.get("/aws-ses/status")
-async def aws_ses_status():
-    """Get AWS SES configuration and status"""
-    try:
-        if not settings.ENABLE_AWS_SES:
-            return {
-                "enabled": False,
-                "message": "AWS SES is not enabled. Set ENABLE_AWS_SES=true to enable."
-            }
-        
-        # Test AWS SES connection
-        if isinstance(email_handler, AWSSESHandler):
-            test_results = await email_handler.test_connection()
-            config_status = settings.verify_ses_configuration()
-            
-            # Enhanced production readiness assessment
-            api_ready = settings.is_production_ready()
-            smtp_ready = test_results.get('smtp_test', False)
-            
-            # Determine overall status and provide guidance
-            if api_ready and smtp_ready:
-                production_status = "fully_ready"
-                readiness_message = "✅ Ready for production (both API and SMTP)"
-            elif api_ready and not smtp_ready:
-                production_status = "api_ready"
-                readiness_message = "⚠️ Ready for API sending (SMTP blocked by firewall)"
-            else:
-                production_status = "not_ready"
-                readiness_message = "❌ Not ready for production"
-            
-            return {
-                "enabled": True,
-                "handler_type": "AWS SES API",
-                "configuration": config_status,
-                "connection_tests": test_results,
-                "production_ready": api_ready,
-                "production_status": production_status,
-                "readiness_message": readiness_message,
-                "smtp_available": smtp_ready
-            }
-        elif isinstance(email_handler, AWSSESSMTPHandler):
-            test_results = await email_handler.test_connection()
-            
-            return {
-                "enabled": True,
-                "handler_type": "AWS SES SMTP",
-                "smtp_test": test_results,
-                "production_ready": settings.is_production_ready()
-            }
-        else:
-            return {
-                "enabled": False,
-                "handler_type": "Local SMTP",
-                "message": "Using local SMTP handler instead of AWS SES"
-            }
-            
-    except Exception as e:
-        return {
-            "enabled": settings.ENABLE_AWS_SES,
-            "error": str(e),
-            "message": "Failed to get AWS SES status"
-        }
-
-@app.get("/aws-ses/statistics")
-async def aws_ses_statistics():
-    """Get AWS SES sending statistics"""
-    try:
-        if not isinstance(email_handler, AWSSESHandler):
-            return {"error": "AWS SES API handler not enabled"}
-        
-        stats = await email_handler.get_sending_statistics()
-        return stats
-        
-    except Exception as e:
-        return {"error": str(e)}
 
 @app.post("/test-email-handler")
 async def test_email_handler(
@@ -154,9 +72,9 @@ async def test_email_handler(
         user_data = get_user_by_id(user_id)
         
         if user_data:
-            from_email = user_data.get("email", f"{user_id}@{settings.AWS_SES_VERIFIED_DOMAIN}")
+            from_email = user_data.get("email", f"{user_id}@epistlo.com")
         else:
-            from_email = f"{user_id}@{settings.AWS_SES_VERIFIED_DOMAIN}"
+            from_email = f"{user_id}@epistlo.com"
         
         # Test email content
         subject = f"Test Email from Epistlo - {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')}"
@@ -205,7 +123,7 @@ async def test_user_lookup(user_id: str):
     # Test enrichment with sample data
     sample_email = {
         "from_address": {
-            "email": f"{user_id}@example.com",
+            "email": f"{user_id}@epistlo.com",
             "name": user_id
         },
         "to_addresses": []
@@ -259,10 +177,10 @@ async def compose_email(
             full_name = f"{first_name} {last_name}".strip()
             if not full_name:
                 full_name = user_data.get("email", user_id)
-            from_address = EmailAddress(email=user_data.get("email", f"{user_id}@example.com"), name=full_name)
+            from_address = EmailAddress(email=user_data.get("email", f"{user_id}@epistlo.com"), name=full_name)
         else:
             # Fallback if user not found
-            from_address = EmailAddress(email=f"{user_id}@example.com", name=user_id)
+            from_address = EmailAddress(email=f"{user_id}@epistlo.com", name=user_id)
         
         # Get attachment metadata for the provided attachment IDs
         attachments = []
@@ -354,7 +272,7 @@ async def compose_email(
                     )
                     
                     smtp_time = time.time() - smtp_start_time
-                    handler_type = "AWS SES" if isinstance(email_handler, (AWSSESHandler, AWSSESSMTPHandler)) else "local SMTP"
+                    handler_type = type(email_handler).__name__
                     print(f"📊 {handler_type} sending took {smtp_time:.2f}s")
                     
                     if not success:
@@ -530,10 +448,10 @@ async def update_email(
             full_name = f"{first_name} {last_name}".strip()
             if not full_name:
                 full_name = user_data.get("email", user_id)
-            from_address = EmailAddress(email=user_data.get("email", f"{user_id}@example.com"), name=full_name)
+            from_address = EmailAddress(email=user_data.get("email", f"{user_id}@epistlo.com"), name=full_name)
         else:
             # Fallback if user not found
-            from_address = EmailAddress(email=f"{user_id}@example.com", name=user_id)
+            from_address = EmailAddress(email=f"{user_id}@epistlo.com", name=user_id)
         
         # Get attachment metadata for the provided attachment IDs
         attachments = []
