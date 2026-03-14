@@ -2,6 +2,7 @@ docs/*
 .env
 backend/.env
 frontend/.env
+frontend/.env.production
 venv
 frontend/node_modules/
 __pycache__/
