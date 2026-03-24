@@ -25,6 +25,8 @@ import {
   Menu,
   MenuItem,
   Tooltip,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Search as SearchIcon,
@@ -65,10 +67,12 @@ import {
 
 
 const EmailInterface: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
   const { cache, loading: emailLoading } = useSelector((state: RootState) => state.email);
-  const { sidebarCollapsed } = useSidebar();
+  const { sidebarCollapsed, setSidebarCollapsed } = useSidebar();
   const { searchQuery } = useSearch();
   
   // State
@@ -367,6 +371,7 @@ const EmailInterface: React.FC = () => {
   const handleFolderChange = (folderId: string) => {
     setCurrentFolder(folderId);
     setViewEmail(null);
+    if (isMobile) setSidebarCollapsed(true); // close drawer on mobile
     
     // Show cached content immediately if available and fresh
     const cached = cache[folderId];
@@ -819,28 +824,15 @@ const EmailInterface: React.FC = () => {
 
 
 
-  return (
-    <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
-      {/* Gmail-style Sidebar */}
-      <Box
-        sx={{
-          width: sidebarCollapsed ? 72 : 256,
-          backgroundColor: 'rgba(0, 0, 0, 0.3)',
-          borderRight: '1px solid rgba(255, 255, 255, 0.1)',
-          display: 'flex',
-          flexDirection: 'column',
-          flexShrink: 0,
-          transition: 'width 0.2s ease-in-out',
-          backdropFilter: 'blur(10px)',
-        }}
-      >
+  // Shared sidebar content used in both the Drawer (mobile) and inline Box (desktop)
+  const sidebarContent = (
+    <>
         {/* Compose Button */}
-        <Box sx={{ p: sidebarCollapsed ? 1 : 2, pt: sidebarCollapsed ? 1 : 2 }}>
+        <Box sx={{ p: sidebarCollapsed && !isMobile ? 1 : 2, pt: sidebarCollapsed && !isMobile ? 1 : 2 }}>
           <Button
             variant="contained"
-            // fullWidth
-            startIcon={!sidebarCollapsed && <AddIcon />}
-            onClick={() => setComposeOpen(true)}
+            startIcon={!(sidebarCollapsed && !isMobile) && <AddIcon />}
+            onClick={() => { setComposeOpen(true); if (isMobile) setSidebarCollapsed(true); }}
             sx={{
               backgroundColor: 'rgba(100, 181, 246, 0.2)',
               color: '#ffffff',
@@ -854,11 +846,11 @@ const EmailInterface: React.FC = () => {
                 backgroundColor: 'rgba(100, 181, 246, 0.3)',
                 boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 4px 8px 3px rgba(0, 0, 0, 0.15)',
               },
-              minWidth: sidebarCollapsed ? 48 : 'auto',
-              justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+              minWidth: sidebarCollapsed && !isMobile ? 48 : 'auto',
+              justifyContent: sidebarCollapsed && !isMobile ? 'center' : 'flex-start',
             }}
           >
-            {sidebarCollapsed ? <AddIcon /> : 'Compose'}
+            {sidebarCollapsed && !isMobile ? <AddIcon /> : 'Compose'}
           </Button>
         </Box>
 
@@ -871,11 +863,11 @@ const EmailInterface: React.FC = () => {
                   selected={currentFolder === folder.id}
                   onClick={() => handleFolderChange(folder.id)}
                   sx={{
-                    mx: sidebarCollapsed ? 1 : 1,
-                    borderRadius: sidebarCollapsed ? '100%' : '0 16px 16px 0',
-                    height: 32,
-                    minWidth: sidebarCollapsed ? 48 : 'auto',
-                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                    mx: sidebarCollapsed && !isMobile ? 1 : 1,
+                    borderRadius: sidebarCollapsed && !isMobile ? '100%' : '0 16px 16px 0',
+                    height: 40,
+                    minWidth: sidebarCollapsed && !isMobile ? 48 : 'auto',
+                    justifyContent: sidebarCollapsed && !isMobile ? 'center' : 'flex-start',
                     '&.Mui-selected': {
                       backgroundColor: 'rgba(100, 181, 246, 0.2)',
                       '&:hover': {
@@ -887,17 +879,16 @@ const EmailInterface: React.FC = () => {
                     },
                   }}
                 >
-                  <ListItemIcon sx={{ 
-                    minWidth: sidebarCollapsed ? 24 : 40, 
+                  <ListItemIcon sx={{
+                    minWidth: sidebarCollapsed && !isMobile ? 24 : 40,
                     color: currentFolder === folder.id ? '#ffffff' : 'rgba(255, 255, 255, 0.8)',
                     justifyContent: 'center',
-                    fontSize: sidebarCollapsed ? '18px' : '18px'
                   }}>
                     {getFolderIcon(folder.icon)}
                   </ListItemIcon>
-                  {!sidebarCollapsed && (
+                  {!(sidebarCollapsed && !isMobile) && (
                     <>
-                      <ListItemText 
+                      <ListItemText
                         primary={folder.name}
                         primaryTypographyProps={{
                           fontSize: '14px',
@@ -906,7 +897,6 @@ const EmailInterface: React.FC = () => {
                         }}
                       />
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        {/* Total email count - only show if > 0 */}
                         {folder.email_count > 0 && (
                           <Typography
                             variant="body2"
@@ -919,10 +909,9 @@ const EmailInterface: React.FC = () => {
                             {folder.email_count.toLocaleString()}
                           </Typography>
                         )}
-                        {/* Unread count badge */}
                         {folder.unread_count > 0 && (
-                          <Badge 
-                            badgeContent={folder.unread_count} 
+                          <Badge
+                            badgeContent={folder.unread_count}
                             color="primary"
                             sx={{
                               '& .MuiBadge-badge': {
@@ -939,31 +928,30 @@ const EmailInterface: React.FC = () => {
                 </ListItemButton>
               </ListItem>
             ))}
-            
+
             {/* More option */}
             <ListItem disablePadding>
               <ListItemButton
                 sx={{
-                  mx: sidebarCollapsed ? 0.5 : 1,
-                  borderRadius: sidebarCollapsed ? '50%' : '0 16px 16px 0',
-                  height: 32,
-                  minWidth: sidebarCollapsed ? 48 : 'auto',
-                  justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                  mx: sidebarCollapsed && !isMobile ? 0.5 : 1,
+                  borderRadius: sidebarCollapsed && !isMobile ? '50%' : '0 16px 16px 0',
+                  height: 40,
+                  minWidth: sidebarCollapsed && !isMobile ? 48 : 'auto',
+                  justifyContent: sidebarCollapsed && !isMobile ? 'center' : 'flex-start',
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   },
                 }}
               >
-                <ListItemIcon sx={{ 
-                  minWidth: sidebarCollapsed ? 24 : 40, 
+                <ListItemIcon sx={{
+                  minWidth: sidebarCollapsed && !isMobile ? 24 : 40,
                   color: 'rgba(255, 255, 255, 0.8)',
                   justifyContent: 'center',
-                  fontSize: sidebarCollapsed ? '20px' : '18px'
                 }}>
                   <ArrowDownIcon />
                 </ListItemIcon>
-                {!sidebarCollapsed && (
-                  <ListItemText 
+                {!(sidebarCollapsed && !isMobile) && (
+                  <ListItemText
                     primary="More"
                     primaryTypographyProps={{
                       fontSize: '14px',
@@ -976,7 +964,50 @@ const EmailInterface: React.FC = () => {
             </ListItem>
           </List>
         </Box>
-      </Box>
+    </>
+  );
+
+  return (
+    <Box sx={{ display: 'flex', height: '100%', width: '100%', overflow: 'hidden' }}>
+      {/* Mobile: Sidebar as overlay Drawer */}
+      {isMobile && (
+        <Drawer
+          anchor="left"
+          open={!sidebarCollapsed}
+          onClose={() => setSidebarCollapsed(true)}
+          PaperProps={{
+            sx: {
+              width: 256,
+              backgroundColor: 'rgba(18, 18, 30, 0.98)',
+              backdropFilter: 'blur(10px)',
+              borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+              display: 'flex',
+              flexDirection: 'column',
+            }
+          }}
+        >
+          {sidebarContent}
+        </Drawer>
+      )}
+
+      {/* Desktop/Tablet: Inline collapsible sidebar */}
+      {!isMobile && (
+        <Box
+          sx={{
+            width: sidebarCollapsed ? 72 : 256,
+            backgroundColor: 'rgba(0, 0, 0, 0.3)',
+            borderRight: '1px solid rgba(255, 255, 255, 0.1)',
+            display: 'flex',
+            flexDirection: 'column',
+            flexShrink: 0,
+            transition: 'width 0.2s ease-in-out',
+            backdropFilter: 'blur(10px)',
+            overflow: 'hidden',
+          }}
+        >
+          {sidebarContent}
+        </Box>
+      )}
 
       {/* Main Content Area */}
       <Box sx={{ 
@@ -1189,8 +1220,8 @@ const EmailInterface: React.FC = () => {
              
               <Box sx={{ flexGrow: 1 }} />
              
-              {/* Pagination text */}
-              <Typography variant="body2" color="text.secondary" sx={{ mr: 1, fontSize: '13px', fontWeight: 500 }}>
+              {/* Pagination text — hide on mobile to save space */}
+              <Typography variant="body2" color="text.secondary" sx={{ mr: 1, fontSize: '13px', fontWeight: 500, display: { xs: 'none', sm: 'block' } }}>
                 {totalEmails > 0 ? `${(currentPage - 1) * limit + 1}-${Math.min(currentPage * limit, totalEmails)} of ${totalEmails.toLocaleString()}` : '0 of 0'}
               </Typography>
              

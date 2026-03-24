@@ -1,4 +1,4 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   AppBar,
@@ -11,7 +11,8 @@ import {
   MenuItem,
   TextField,
   InputAdornment,
-  Badge,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -20,7 +21,6 @@ import {
   HelpOutline as HelpIcon,
   Settings as SettingsIcon,
   Apps as AppsIcon,
-  AccountCircle as AccountIcon,
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import { RootState } from '../../store';
@@ -60,11 +60,23 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
   const dispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.auth);
+
+  // On desktop, default sidebar to expanded; on mobile/tablet keep it closed
+  useEffect(() => {
+    if (!isMobile) {
+      setSidebarCollapsed(false);
+    } else {
+      setSidebarCollapsed(true);
+    }
+  }, [isMobile]);
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -86,23 +98,26 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <SidebarContext.Provider value={{ sidebarCollapsed, setSidebarCollapsed }}>
       <SearchContext.Provider value={{ searchQuery, setSearchQuery }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
           {/* Gmail-style Top Bar */}
-          <AppBar 
-            position="static" 
-            sx={{ 
+          <AppBar
+            position="static"
+            sx={{
               height: 64,
+              flexShrink: 0,
             }}
           >
-            <Toolbar sx={{ minHeight: '64px !important', px: 2, gap: 1 }}>
+            <Toolbar sx={{ minHeight: '64px !important', px: { xs: 1, sm: 2 }, gap: 1 }}>
               {/* Hamburger Menu */}
               <IconButton
                 color="inherit"
                 aria-label="toggle sidebar"
                 edge="start"
                 onClick={handleSidebarToggle}
-                sx={{ 
-                  mr: 1,
+                sx={{
+                  mr: { xs: 0, sm: 1 },
+                  minWidth: 44,
+                  minHeight: 44,
                   '&:hover': {
                     backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   }
@@ -111,33 +126,33 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 <MenuIcon />
               </IconButton>
 
-              {/* Gmail Logo */}
-              <Box sx={{ display: 'flex', alignItems: 'center', mr: 3 }}>
-                <Typography 
-                  variant="h6" 
-                  sx={{ 
+              {/* Logo */}
+              <Box sx={{ display: 'flex', alignItems: 'center', mr: { xs: 0, sm: 3 } }}>
+                <Typography
+                  variant="h6"
+                  sx={{
                     fontWeight: 400,
-                    fontSize: '22px',
+                    fontSize: { xs: '18px', sm: '22px' },
                     letterSpacing: '0.25px',
                     fontFamily: '"Google Sans", "Roboto", "Arial", sans-serif',
                     background: 'linear-gradient(45deg, #64b5f6, #42a5f5)',
                     backgroundClip: 'text',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
+                    whiteSpace: 'nowrap',
                   }}
                 >
                   Epistlo
                 </Typography>
               </Box>
 
-              {/* Search Bar */}
-              <Box sx={{ 
-                flexGrow: 1, 
-                maxWidth: 720, 
+              {/* Search Bar — hidden on mobile */}
+              <Box sx={{
+                flexGrow: 1,
+                maxWidth: 720,
                 mx: 'auto',
-                display: 'flex',
-                // justifyContent: 'center',
-                marginLeft: '82px',
+                display: { xs: 'none', sm: 'flex' },
+                ml: { sm: '16px', md: '82px' },
               }}>
                 <TextField
                   fullWidth
@@ -147,7 +162,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                      borderRadius: '24px', // Changed to circular sides
+                      borderRadius: '24px',
                       height: 48,
                       '&:hover': {
                         backgroundColor: 'rgba(255, 255, 255, 0.15)',
@@ -185,11 +200,18 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 />
               </Box>
 
+              {/* Spacer on mobile so avatar goes to right */}
+              <Box sx={{ flexGrow: 1, display: { xs: 'flex', sm: 'none' } }} />
+
               {/* Right side icons */}
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 2 }}>
-                <IconButton 
-                  size="small" 
-                  sx={{ 
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: { xs: 0, sm: 2 } }}>
+                {/* Hide decorative icons on mobile — too cramped */}
+                <IconButton
+                  size="small"
+                  sx={{
+                    display: { xs: 'none', md: 'flex' },
+                    minWidth: 44,
+                    minHeight: 44,
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     }
@@ -197,9 +219,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   <HelpIcon />
                 </IconButton>
-                <IconButton 
-                  size="small" 
-                  sx={{ 
+                <IconButton
+                  size="small"
+                  sx={{
+                    display: { xs: 'none', md: 'flex' },
+                    minWidth: 44,
+                    minHeight: 44,
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     }
@@ -207,9 +232,12 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   <SettingsIcon />
                 </IconButton>
-                <IconButton 
-                  size="small" 
-                  sx={{ 
+                <IconButton
+                  size="small"
+                  sx={{
+                    display: { xs: 'none', md: 'flex' },
+                    minWidth: 44,
+                    minHeight: 44,
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     }
@@ -217,22 +245,40 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                 >
                   <AppsIcon />
                 </IconButton>
+
+                {/* Search icon on mobile (in-place of the search bar) */}
                 <IconButton
-                  size="large"
+                  size="small"
+                  sx={{
+                    display: { xs: 'flex', sm: 'none' },
+                    minWidth: 44,
+                    minHeight: 44,
+                    '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' },
+                  }}
+                  onClick={() => {
+                    // Focus the search bar (will show on tablet+ or trigger some future mobile search)
+                  }}
+                >
+                  <SearchIcon />
+                </IconButton>
+
+                <IconButton
                   edge="end"
                   aria-label="account of current user"
                   aria-controls="primary-search-account-menu"
                   aria-haspopup="true"
                   onClick={handleProfileMenuOpen}
-                  sx={{ 
+                  sx={{
+                    minWidth: 44,
+                    minHeight: 44,
                     '&:hover': {
                       backgroundColor: 'rgba(255, 255, 255, 0.1)',
                     }
                   }}
                 >
-                  <Avatar 
-                    sx={{ 
-                      width: 32, 
+                  <Avatar
+                    sx={{
+                      width: 32,
                       height: 32,
                       backgroundColor: '#64b5f6',
                       fontSize: '14px',
@@ -286,7 +332,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </Menu>
 
           {/* Main Content */}
-          <Box sx={{ flexGrow: 1, display: 'flex' }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
             {children}
           </Box>
         </Box>
@@ -295,4 +341,4 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   );
 };
 
-export default Layout; 
+export default Layout;

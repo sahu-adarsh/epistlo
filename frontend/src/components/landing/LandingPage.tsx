@@ -184,8 +184,9 @@ const LandingPage: React.FC = () => {
                 position: 'relative'
               }}>
                                  <Box sx={{
-                   width: 400,
-                   height: 300,
+                   width: { xs: '100%', sm: 400 },
+                   maxWidth: 400,
+                   height: { xs: 200, sm: 300 },
                    background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(100, 181, 246, 0.1))',
                    borderRadius: '20px',
                    border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -324,21 +325,22 @@ const LandingPage: React.FC = () => {
        }}>
         <Container maxWidth="md">
           <Grow in={animate} timeout={2000}>
-                         <Box sx={{ 
+                         <Box sx={{
                textAlign: 'center',
                background: 'linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(100, 181, 246, 0.1))',
-               borderRadius: '24px',
+               borderRadius: { xs: '16px', sm: '24px' },
                border: '1px solid rgba(255, 255, 255, 0.1)',
-               p: 6,
+               p: { xs: 3, sm: 6 },
                backdropFilter: 'blur(10px)',
                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)'
              }}>
-               <Typography 
-                 variant="h3" 
-                 sx={{ 
-                   fontWeight: 600, 
+               <Typography
+                 variant="h3"
+                 sx={{
+                   fontWeight: 600,
                    mb: 2,
-                   color: 'white'
+                   color: 'white',
+                   fontSize: { xs: '1.5rem', sm: '2.2rem', md: '3rem' },
                  }}
                >
                  Ready to Transform Your Email Experience?
