@@ -11,6 +11,8 @@ import {
   Divider,
   Alert,
   LinearProgress,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import {
   Send as SendIcon,
@@ -354,20 +356,31 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
     onClose();
   };
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   if (!open) return null;
 
   return (
     <>
       <Paper
         elevation={8}
-        sx={{
+        sx={isMobile ? {
+          // Mobile: full-screen overlay
           position: 'fixed',
-          bottom: 20,
-          right: 20,
+          top: 0, left: 0, right: 0, bottom: 0,
+          width: '100%', height: '100%',
+          display: 'flex', flexDirection: 'column',
+          zIndex: 1400,
+          borderRadius: 0,
+          overflow: 'hidden',
+        } : {
+          // Desktop: floating bottom-right window
+          position: 'fixed',
+          bottom: 20, right: 20,
           width: isExpanded ? 600 : 500,
           height: isExpanded ? 500 : 400,
-          display: 'flex',
-          flexDirection: 'column',
+          display: 'flex', flexDirection: 'column',
           zIndex: 1300,
           borderRadius: '8px',
           overflow: 'hidden',

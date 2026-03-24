@@ -417,7 +417,7 @@ const MultiStepRegister: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              padding: 4,
+              padding: { xs: 2.5, sm: 4 },
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -445,28 +445,21 @@ const MultiStepRegister: React.FC = () => {
             </Typography>
 
             {/* Stepper */}
-            <Stepper 
-              activeStep={activeStep} 
-              sx={{ 
-                width: '100%', 
+            <Stepper
+              activeStep={activeStep}
+              sx={{
+                width: '100%',
                 mb: 4,
                 '& .MuiStepLabel-label': {
                   color: 'rgba(255, 255, 255, 0.7)',
-                  '&.Mui-active': {
-                    color: '#64b5f6',
-                  },
-                  '&.Mui-completed': {
-                    color: 'rgba(255, 255, 255, 0.9)',
-                  },
+                  display: { xs: 'none', sm: 'block' },
+                  '&.Mui-active': { color: '#64b5f6' },
+                  '&.Mui-completed': { color: 'rgba(255, 255, 255, 0.9)' },
                 },
                 '& .MuiStepIcon-root': {
                   color: 'rgba(255, 255, 255, 0.3)',
-                  '&.Mui-active': {
-                    color: '#64b5f6',
-                  },
-                  '&.Mui-completed': {
-                    color: '#64b5f6',
-                  },
+                  '&.Mui-active': { color: '#64b5f6' },
+                  '&.Mui-completed': { color: '#64b5f6' },
                 },
               }}
             >

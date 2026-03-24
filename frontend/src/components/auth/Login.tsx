@@ -139,7 +139,7 @@ const Login: React.FC = () => {
           <Paper
             elevation={0}
             sx={{
-              padding: 4,
+              padding: { xs: 2.5, sm: 4 },
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
