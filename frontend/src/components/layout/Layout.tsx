@@ -98,13 +98,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <SidebarContext.Provider value={{ sidebarCollapsed, setSidebarCollapsed }}>
       <SearchContext.Provider value={{ searchQuery, setSearchQuery }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden', paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {/* Gmail-style Top Bar */}
           <AppBar
             position="static"
             sx={{
-              height: 64,
+              height: 'calc(64px + env(safe-area-inset-top))',
               flexShrink: 0,
+              paddingTop: 'env(safe-area-inset-top)',
             }}
           >
             <Toolbar sx={{ minHeight: '64px !important', px: { xs: 1, sm: 2 }, gap: 1 }}>

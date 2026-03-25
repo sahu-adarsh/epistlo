@@ -13,7 +13,7 @@ function App() {
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
       <Routes>
         <Route 
           path="/landing" 
