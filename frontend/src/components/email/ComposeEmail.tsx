@@ -366,7 +366,7 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
       <Paper
         elevation={8}
         sx={isMobile ? {
-          // Mobile: full-screen overlay
+          // Mobile: full-screen overlay with safe-area insets for Dynamic Island / home bar
           position: 'fixed',
           top: 0, left: 0, right: 0, bottom: 0,
           width: '100%', height: '100%',
@@ -374,6 +374,10 @@ const ComposeEmail: React.FC<ComposeEmailProps> = ({
           zIndex: 1400,
           borderRadius: 0,
           overflow: 'hidden',
+          paddingTop: 'env(safe-area-inset-top)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+          paddingLeft: 'env(safe-area-inset-left)',
+          paddingRight: 'env(safe-area-inset-right)',
         } : {
           // Desktop: floating bottom-right window
           position: 'fixed',

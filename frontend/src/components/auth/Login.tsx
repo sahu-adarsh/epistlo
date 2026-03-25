@@ -110,8 +110,8 @@ const Login: React.FC = () => {
         onClick={handleGoBack}
         sx={{
           position: 'absolute',
-          top: 20,
-          left: 20,
+          top: 'max(20px, calc(env(safe-area-inset-top) + 8px))',
+          left: 'max(20px, env(safe-area-inset-left))',
           color: 'rgba(255, 255, 255, 0.8)',
           background: 'rgba(0, 0, 0, 0.3)',
           border: '1px solid rgba(255, 255, 255, 0.1)',

@@ -855,7 +855,7 @@ const EmailInterface: React.FC = () => {
         </Box>
 
         {/* Folder List */}
-        <Box sx={{ flexGrow: 1, overflow: 'auto', mt: 1 }}>
+        <Box sx={{ flexGrow: 1, overflow: 'auto', mt: 1, overscrollBehavior: 'contain', WebkitOverflowScrolling: 'touch' }}>
           <List sx={{ py: 0 }}>
             {folders.map((folder) => (
               <ListItem key={folder.id} disablePadding>
@@ -1257,10 +1257,13 @@ const EmailInterface: React.FC = () => {
               )}
              
               {/* Email List - Takes remaining space */}
-              <Box sx={{ 
-                flexGrow: 1, 
+              <Box sx={{
+                flexGrow: 1,
                 overflow: 'auto',
                 minHeight: 0, // Important for flex child to shrink properly
+                overscrollBehavior: 'contain',
+                WebkitOverflowScrolling: 'touch',
+                paddingBottom: 'env(safe-area-inset-bottom)',
               }}>
                 <EmailList
                   emails={emails}
