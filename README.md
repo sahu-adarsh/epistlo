@@ -1,21 +1,56 @@
 # Epistlo
 
-Sign up and get your own **@epistlo.com** email address. Send and receive real emails, manage your inbox, and connect with any email client you already use.
+> A self-hosted email service with real **@epistlo.com** addresses, built on FastAPI microservices and a custom SMTP/IMAP stack.
 
 *From Latin epistola, Greek epistolē: "something sent to someone."*
 
-**Live:** [https://epistlo.com](https://epistlo.com)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white&labelColor=20232a)
+![FastAPI](https://img.shields.io/badge/FastAPI-3%20services-009688?logo=fastapi&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?logo=supabase&logoColor=white)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+**Live → [epistlo.com](https://epistlo.com)**
+
+---
+
+## Screenshots
+
+| Landing | Inbox |
+|---|---|
+| ![Landing page](screenshots/landing.png) | ![Inbox](screenshots/inbox.png) |
+
+| Compose | Email View |
+|---|---|
+| ![Compose](screenshots/compose.png) | ![Email view](screenshots/email-view.png) |
 
 ---
 
 ## Features
 
-- Real @epistlo.com addresses with working mailboxes
-- Send and receive emails over SMTP
-- IMAP support so you can use any email client with your Epistlo account
-- File attachments up to 25MB, stored on AWS S3
-- Folders, starring, read/unread tracking
-- Full-text email search
+- **Real mailboxes** — every account gets a working `@epistlo.com` address
+- **SMTP & IMAP** — send/receive over standard protocols; connect any email client
+- **Attachments** — up to 25 MB per email, stored on AWS S3
+- **Full-text search** — powered by Elasticsearch, falls back to Supabase `ilike`
+- **Folders & starring** — system folders + custom, read/unread tracking
+- **Responsive UI** — Material-UI dark theme, works on mobile and desktop
+- **Rate limiting** — per-user send limits configurable via env vars
+
+---
+
+## Architecture
+
+![Architecture](screenshots/architecture.png)
+
+---
+
+| Service | Port |
+|---|---|
+| React frontend | 3000 |
+| Auth service | 8000 |
+| Email service | 8001 |
+| Mailbox service | 8002 |
+| SMTP receiver | 2525 |
+| IMAP server | 1143 |
 
 ---
 
@@ -23,55 +58,51 @@ Sign up and get your own **@epistlo.com** email address. Send and receive real e
 
 | Layer | Technology |
 |---|---|
-| Frontend | React 18, TypeScript, Material-UI (dark theme), Redux Toolkit |
-| Backend | Python 3.11, FastAPI (3 microservices) |
+| Frontend | React 18, TypeScript, Material-UI, Redux Toolkit, React Router v6 |
+| Backend | Python 3.11, FastAPI, Uvicorn (3 microservices) |
 | Database | Supabase (PostgreSQL + Auth + Row-Level Security) |
 | Outbound email | Resend (epistlo.com domain verified) |
-| Inbound email | Custom SMTP server (port 25 to 2525) |
-| IMAP | Custom IMAP server (port 1143) |
-| Storage | AWS S3 |
-| Search | Elasticsearch (optional, falls back to Supabase search) |
-| Cache | Redis (optional, app works without it) |
-| Hosting | AWS EC2 t3.small, Nginx, Let's Encrypt HTTPS |
+| Inbound email | Custom SMTP server |
+| IMAP | Custom IMAP server |
+| Storage | AWS S3 (falls back to local filesystem) |
+| Search | Elasticsearch (falls back to Supabase search) |
+| Cache | Redis (optional) |
+| Hosting | AWS EC2, Nginx, Let's Encrypt |
 
 ---
 
-## Architecture
-
-Three FastAPI microservices plus email servers:
-
-| Service | Port |
-|---|---|
-| Auth service | 8000 |
-| Email service | 8001 |
-| Mailbox service | 8002 |
-| SMTP receive server | 2525 |
-| IMAP server | 1143 |
-
----
-
-## Local Development
+## Quick Start
 
 ### Prerequisites
 
 - Python 3.11+
 - Node.js 18+
-- Docker (for optional Elasticsearch, Redis)
+- Docker (for Elasticsearch and Redis)
 
-### Backend
+### 1. Clone & configure
 
 ```bash
-python -m venv venv
-source venv/bin/activate
+git clone https://github.com/sahu-adarsh/epistlo.git
+cd epistlo
+cp backend/.env.example backend/.env   # fill in values below
+cp frontend/.env.example frontend/.env
+```
+
+### 2. Start the backend
+
+```bash
+python -m venv venv && source venv/bin/activate
 pip install -r requirements.txt
+
+docker-compose up -d   # starts Elasticsearch + Redis
 
 cd backend
 python run_integrated_server.py
 ```
 
-This starts all 3 FastAPI services plus the SMTP/IMAP email servers.
+This starts all 3 FastAPI services plus the SMTP/IMAP servers.
 
-### Frontend
+### 3. Start the frontend
 
 ```bash
 cd frontend
@@ -85,21 +116,27 @@ npm start   # http://localhost:3000
 
 ### `backend/.env`
 
-```
-SUPABASE_URL=
-SUPABASE_KEY=
-SUPABASE_SERVICE_KEY=
-SECRET_KEY=           # JWT signing key (openssl rand -hex 32)
-RESEND_API_KEY=       # for outbound email
-MAX_EMAILS_PER_HOUR=
-MAX_EMAILS_PER_DAY=
-```
+| Variable | Description |
+|---|---|
+| `SUPABASE_URL` | Your Supabase project URL |
+| `SUPABASE_KEY` | Supabase anon/public key |
+| `SUPABASE_SERVICE_KEY` | Supabase service role key |
+| `SECRET_KEY` | JWT signing key — `openssl rand -hex 32` |
+| `RESEND_API_KEY` | Resend API key for outbound email |
+| `MAX_EMAILS_PER_HOUR` | Per-user send rate limit |
+| `MAX_EMAILS_PER_DAY` | Per-user daily send limit |
 
 ### `frontend/.env`
 
-```
-REACT_APP_SUPABASE_URL=
-REACT_APP_SUPABASE_ANON_KEY=
-```
+| Variable | Description |
+|---|---|
+| `REACT_APP_SUPABASE_URL` | Your Supabase project URL |
+| `REACT_APP_SUPABASE_ANON_KEY` | Supabase anon/public key |
 
-> Run the backend from the `backend/` directory. `load_dotenv()` reads from the working directory.
+> Always run the backend from the `backend/` directory — `load_dotenv()` reads `.env` from the working directory.
+
+---
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for details.
