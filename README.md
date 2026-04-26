@@ -49,17 +49,6 @@
 
 ---
 
-| Service | Port |
-|---|---|
-| React frontend | 3000 |
-| Auth service | 8000 |
-| Email service | 8001 |
-| Mailbox service | 8002 |
-| SMTP receiver | 2525 |
-| IMAP server | 1143 |
-
----
-
 ## Tech Stack
 
 | Layer | Technology |
