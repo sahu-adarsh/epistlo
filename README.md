@@ -43,6 +43,12 @@
 
 ---
 
+## Email Infrastructure
+
+![Email Infrastructure](screenshots/email-infra.png)
+
+---
+
 | Service | Port |
 |---|---|
 | React frontend | 3000 |
@@ -51,12 +57,6 @@
 | Mailbox service | 8002 |
 | SMTP receiver | 2525 |
 | IMAP server | 1143 |
-
----
-
-## Email Infrastructure
-
-![Email Infrastructure](screenshots/email-infra.png)
 
 ---
 
