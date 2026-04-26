@@ -56,44 +56,7 @@
 
 ## Email Infrastructure
 
-```mermaid
-flowchart TD
-    subgraph SMTP ["SMTP Receive Server · port 2525"]
-        direction TB
-        S1["220 Ready"]
-        S1 --> S2["EHLO → MAIL FROM → RCPT TO"]
-        S2 --> S3["DATA received"]
-        S3 --> S4["Parse MIME\nbytesparser.walk()"]
-        S4 --> S5{Part type?}
-        S5 -->|text / html| S6["Extract body"]
-        S5 -->|attachment| S7["MockUploadFile\n→ save_attachment()"]
-        S6 & S7 --> S8["Lookup RCPT in Supabase"]
-        S8 --> S9["create_email\nstatus = RECEIVED"]
-        S9 --> S10["Index in Elasticsearch"]
-        S10 --> S11["Invalidate Redis cache"]
-        S11 --> S12["250 OK → QUIT"]
-    end
-
-    subgraph IMAP ["IMAP Server · port 1143"]
-        direction TB
-        I1["NOT_AUTHENTICATED"]
-        I1 -->|LOGIN| I2["AUTHENTICATED"]
-        I2 -->|SELECT mailbox| I3["SELECTED\nreal counts from Supabase"]
-        I3 -->|FETCH| I4["stub ⚠"]
-        I3 -->|SEARCH| I5["stub ⚠"]
-        I3 -->|STORE / EXPUNGE| I6["no-op ⚠"]
-        I2 & I3 -->|LOGOUT| I7["Connection closed"]
-    end
-
-    Sender(["External Sender"]) -->|TCP| SMTP
-    EmailClient(["Email Client"]) -->|TCP| IMAP
-
-    SMTP -->|write| DB[("Supabase")]
-    SMTP -->|index| ES[("Elasticsearch")]
-    SMTP -->|invalidate| Cache[("Redis")]
-    SMTP -->|store| Storage[("S3 / Local")]
-    IMAP -->|read counts| DB
-```
+![Email Infrastructure](screenshots/email-infra.png)
 
 ---
 
