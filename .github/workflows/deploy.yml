@@ -1,4 +1,4 @@
-name: Deploy to EC2
+name: Deploy to Azure VM
 
 on:
   push:
@@ -9,12 +9,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to EC2 via SSH
+      - name: Deploy to Azure VM via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 54.242.20.213
+          host: 20.46.255.27
           username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.AZURE_SSH_KEY }}
           script: |
             set -e
 

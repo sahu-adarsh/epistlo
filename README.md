@@ -62,7 +62,7 @@
 | Storage | AWS S3 (falls back to local filesystem) |
 | Search | Elasticsearch (falls back to Supabase search) |
 | Cache | Redis (optional) |
-| Hosting | AWS EC2, Nginx, Let's Encrypt |
+| Hosting | Azure VM, Nginx, Let's Encrypt |
 
 ---
 
