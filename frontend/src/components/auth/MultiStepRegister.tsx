@@ -126,7 +126,9 @@ const MultiStepRegister: React.FC = () => {
         return;
       }
       if (usernameAvailable === null) {
-        checkUsernameAvailability(formData.username.trim());
+        if (!checkingUsername) {
+          checkUsernameAvailability(formData.username.trim());
+        }
         return;
       }
     }

@@ -15,7 +15,7 @@ app = FastAPI(title="Auth Service", version="1.0.0")
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://epistlo.com", "https://www.epistlo.com", "http://localhost:3000"],
+    allow_origins=["https://epistlo.com", "https://www.epistlo.com", "http://localhost:3000", "http://localhost:3001", "http://localhost:3002"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -128,7 +128,7 @@ async def health_check():
     return {"status": "healthy", "service": "auth-service"}
 
 @app.post("/check-email-availability", response_model=EmailAvailabilityResponse)
-async def check_email_availability(request: EmailAvailabilityRequest):
+def check_email_availability(request: EmailAvailabilityRequest):
     """Check if an email address is available for registration"""
     try:
         # Only allow epistlo.com domain emails
